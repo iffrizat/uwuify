@@ -100,6 +100,7 @@ local smileys = {
 -- Brace yourself for lots of replaces --
 
 local function uwuify(text) 
+    text = string.Trim(text) -- No more phantom spaces
     for k, v in pairs(replacement_table) do
         text = string.Replace(text, k, v)
     end -- Easy replacements --
