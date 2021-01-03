@@ -105,7 +105,17 @@ local function uwuify(text)
         text = string.Replace(text, k, v)
     end -- Easy replacements --
 
-    text = string.Replace(text, "!", "! " .. smileys[ math.random( #smileys ) ]) -- Smileys after exclamation mark --
+    local occurences = {}
+    for v in string.gmatch(text, "[%l%d]![1!]*") do
+        if !v then break end
+        if table.HasValue(occurences, v) then continue end
+        occurences[#occurences+1] = v
+    end
+    for _, v in pairs(occurences) do
+        if !v then break end
+        text = string.Replace(text, v, v .. " " .. smileys[ math.random( #smileys ) ])
+    end -- Improved smileys after exclamation mark --
+
 
     for v in string.gmatch(text, "n[aeiou]") do
         if !v then break end
