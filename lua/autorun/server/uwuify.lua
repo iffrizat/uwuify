@@ -99,8 +99,10 @@ local smileys = {
 
 -- Brace yourself for lots of replaces --
 
+local function is_capital(text) return string.upper(text) == text end
+
 local function uwuify(text) 
-    text = string.Trim(text) -- No more phantom spaces
+
     for k, v in pairs(replacement_table) do
         text = string.Replace(text, k, v)
     end -- Easy replacements --
@@ -116,27 +118,40 @@ local function uwuify(text)
         text = string.Replace(text, v, v .. " " .. smileys[ math.random( #smileys ) ])
     end -- Improved smileys after exclamation mark --
 
-
-    for v in string.gmatch(text, "n[aeiou]") do
+    for v in string.gmatch(text, "[Nn][aeiouAEIOU]") do
         if !v then break end
-        text = string.Replace(text, v, "ny" .. v[2])
-    end -- nya~ --
+        text = string.Replace(text, v, v[1] .. (is_capital(v[2]) and "Y" or "y") .. v[2])
+    end -- Better nya~ --
 
     return text
 end
 
-hook.Add("PlayerSay", "Uwuify", function ( sender, text ) 
-        if string.StartWith(text, "/uwu") then
-            text = string.Replace(text, "/uwu", "") -- Getting rid of the "/uwu" --
-            return uwuify(text)
+hook.Add("PlayerSay", "Uwuify", function (sender, text) 
+    text = string.Trim(text) -- No more phantom spaces --
 
-        else if string.StartWith(text, "/painuwu") then -- Absolutely incomprehensible. --
-            text = string.Replace(text, "/painuwu", "")
-            for k, v in pairs(painful_replacement_table) do
-                text = string.Replace(text, k, v)
-            end 
+    if string.StartWith(text, "/uwu") then
 
-            return uwuify(text)
+        if text == "/uwu" then
+            sender:ChatPrint("Usage: /uwu <text>")
+            return ""
+        end -- Happens when there's no input --
+
+        text = string.Replace(text, "/uwu", "") -- Getting rid of the "/uwu" --
+
+        return uwuify(text)
+
+    elseif string.StartWith(text, "/painuwu") then
+
+        if text == "/painuwu" then
+            sender:ChatPrint("Usage: /painuwu <text>")
+            return ""
+        end -- Happens when there's no input --
+
+        text = string.Replace(text, "/painuwu", "")
+        for k, v in pairs(painful_replacement_table) do
+            text = string.Replace(text, k, v)
         end
+
+        return uwuify(text)
     end
 end)
